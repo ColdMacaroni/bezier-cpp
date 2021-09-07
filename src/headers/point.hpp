@@ -14,6 +14,12 @@ namespace point
             this->y = _y;
         };
 
+        Point(std::pair<c_T, c_T> p)
+        {
+            this->x = p.first;
+            this->y = p.second;
+        };
+
         std::string to_string(void)
         {
             /* (x, y) */
