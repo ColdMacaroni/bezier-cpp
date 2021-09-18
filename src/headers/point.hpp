@@ -8,6 +8,12 @@ namespace point
     {
         c_T x, y;
 
+        Point()
+        {
+            this->x = 0;
+            this->y = 0;
+        };
+
         Point(c_T _x, c_T _y)
         {
             this->x = _x;
