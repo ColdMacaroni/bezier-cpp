@@ -47,7 +47,11 @@ file(MAKE_DIRECTORY ${LIBRARY_OUTPUT_PATH})
 #add_library(somename SHARED ${bezier_LIB})
 add_executable(bezier ${bezier_SRC})
 #target_link_libraries( bezier somename )
+find_package(OpenGL REQUIRED)
+find_package(GLUT REQUIRED)
 
+include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} )
+target_link_libraries( bezier ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )
 #If your app, links to an external lib -ie Boost
 #target_link_libraries( bezier ${Boost_LIBRARIES} )
 
