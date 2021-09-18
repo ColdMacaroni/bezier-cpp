@@ -45,6 +45,11 @@ namespace point
         {
             return Point<c_T>(this->x + other, this->y + other);
         };
+        void operator+=(c_T other)
+        {
+            this->x += other;
+            this->y += other;
+        };
 
         Point<c_T> operator-(c_T other)
         {
@@ -54,6 +59,12 @@ namespace point
         Point<c_T> operator*(c_T other)
         {
             return Point<c_T>(this->x * other, this->y * other);
+        };
+
+        void operator*=(c_T other)
+        {
+            this->x *= other;
+            this->y *= other;
         };
 
         Point<c_T> operator/(c_T other)
