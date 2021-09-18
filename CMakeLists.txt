@@ -48,15 +48,10 @@ endif()
 #EXAMPLE! ->
 #find_package( Boost 1.60 COMPONENTS system filesystem REQUIRED )
 #include_directories( ${Boost_INCLUDE_DIR} )
-find_package(OpenGL REQUIRED)
-find_package(GLUT REQUIRED)
-include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} )
 
 #Conditional compilation, platform specific code
 #if(some_platform_here)
 #	include_directories("include/some_platform_here")
 #endif()
-#target_link_libraries( bezier ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )
+
 add_subdirectory(src)
-# ????????????????????????????????????
-target_link_libraries( OpenGL::OpenGL ${GLUT_LIBRARY} )
