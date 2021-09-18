@@ -3,10 +3,12 @@
 #include <string>
 #include <cctype>
 
-// #include <GL/freeglut.h>
-#include <raylib.h>
-
 #include <point.hpp>
+
+namespace raylib
+{
+    #include <raylib.h>
+}
 
 #define SIZE 640
 
@@ -37,52 +39,6 @@ string_to_pair(std::string str)
     return std::make_pair(x, y);
 }
 
-/*
-void init()
-{
-    glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB);
-    glutInitWindowSize(SIZE, SIZE);
-    glutInitWindowPosition(200, 50);
-    glutCreateWindow("Bezier");
-}
-
-void display()
-{
-    /*
-    glClearColor(1.0, 1.0, 1.0, 0.0);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glColor3f(0.0,0.4,0.2);
-    glPointSize(3.0);
-
-    glBegin(GL_LINES);
-    glVertex2d(180, 15);
-    glVertex2d(10, 145);
-
-    glFlush();
-    */
-    /*
-    glClear(GL_COLOR_BUFFER_BIT);
-    glClearColor(1.0, 1.0, 1.0, 0.0);
-
-    glColor3f(0, 0, 0);
-    glPointSize(50.0);
-
-    glBegin(GL_LINES);
-    glVertex2i(0, 0);
-    glVertex2i(SIZE, SIZE);
-    glEnd();
-    glFlush();
-}
-
-/*https://stackoverflow.com/a/22374339*/
-/*
-void resize(int width, int height) {
-    glutReshapeWindow(SIZE, SIZE);
-}
-
-/**/
-
 int main( int argc, char** argv)
 {
     std::vector<Point> points;
@@ -96,7 +52,7 @@ int main( int argc, char** argv)
     for (long unsigned i = 0; i < points.size(); i++)
         std::cout << points[i].to_string() << '\n';
 
-    InitWindow(SIZE, SIZE, "Bezier Curve");
+    raylib::InitWindow(SIZE, SIZE, "Bezier Curve");
 
     /*
     glutInit(&argc,argv);
