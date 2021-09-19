@@ -12,6 +12,11 @@ namespace raylib
     #include <raylib.h>
 }
 
+namespace std
+{
+    #include <unistd.h>
+}
+
 #define W_WIDTH 640
 #define W_HEIGHT 640
 
@@ -136,7 +141,9 @@ class Bezier
 
     Point get_point(double t)
     {
-        if (t < 0 || t > 1)
+        // I hate floating point numbers.
+        // (double)1 - 1 gives like 2e-23
+        if (t < 0 || (t - 1) == ((double)1 - 1))
             throw std::invalid_argument("t must be between 0 and 1");
         return calculate(points, t);
     }
@@ -165,7 +172,6 @@ int main(int argc, char** argv)
     for (long unsigned i = 0; i < points.size(); i++)
     {
         points[i] = tf_pt(points[i]);
-        std::cout << points[i].to_string() << '\n';
     }
 
     Bezier bezier = Bezier(points);
@@ -177,27 +183,34 @@ int main(int argc, char** argv)
     const float thickness = 2.5;
 
     double t = 0;
-    Point new_pt;
+    std::vector<Point> curve;
+
     while (!raylib::WindowShouldClose())
     {
-        if (t > 1)
-            t = 0;
-
         raylib::BeginDrawing();
             raylib::ClearBackground(raylib::WHITE);
 
             for (Point pt : bezier.get_points())
                 raylib::DrawCircle(pt.x, pt.y, thickness*2, (raylib::Color){0, 0, 0, 128});
 
-            new_pt = bezier.get_point(t);
-            std::cout << new_pt.to_string() << "\n";
+            curve.push_back(bezier.get_point(t));
 
-            raylib::DrawCircle(new_pt.x, new_pt.y, thickness*2, (raylib::Color){0, 0, 0xff, 0xff});
+            if (curve.size() > 1)
+                for (size_t i = 1; i < curve.size(); i++)
+                    raylib::DrawLineEx(pt_to_v(curve[i-1]), pt_to_v(curve[i]), thickness, raylib::BLUE);
 
             //raylib::DrawLineEx(pt_to_v(points[0]), pt_to_v(points[1]), thickness, raylib::BLACK);
 
         raylib::EndDrawing();
-        t += 0.05;
+
+        if (t > 1)
+        {
+            std::sleep(1);
+            curve.clear();
+            t = 0;
+        }
+        else
+            t += 0.01;
     }
 
     raylib::CloseWindow();
