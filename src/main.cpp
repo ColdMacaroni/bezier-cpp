@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <cctype>
+#include <stdexcept>
 
 #include <point.hpp>
 
@@ -59,68 +60,80 @@ raylib::Vector2 pt_to_v(Point pt)
     return v;
 }
 
-void fit_points(std::vector<Point> &pts, int padding = 10)
+void fit_points(std::vector<Point> &pts, int padding = 20)
 {
     /* Makes the points bigger so they fit on the screen better */
     // First get the maximum distance
     if (pts.size() <= 1)
         return ;
 
-    // Get min and max for both x and y to calculate biggest distance
-    double min_x, max_x;
-    min_x = max_x = pts[0].x;
-
-    double min_y, max_y;
-    min_y = max_y = pts[0].y;
-
-    for (unsigned int i = 0; i < pts.size(); i++)
+    // Get max for x and y
+    double max_x = pts[0].x, max_y = pts[0].y;
+    for (size_t i = 0; i < pts.size(); i++)
     {
-        if (pts[i].x < min_x)
-        {
-            min_x = pts[i].x;
-        }
-        else if (pts[i].x > max_x)
-        {
+        if (pts[i].x > max_x)
             max_x = pts[i].x;
-        }
-
-        if (pts[i].y < min_y)
-        {
-            min_y = pts[i].y;
-        }
-        else if (pts[i].y > max_y)
-        {
+        if (pts[i].y > max_y)
             max_y = pts[i].y;
-        }
     }
-    std::cout << "max, min" << max_x << min_x << "\n";
-    double dist_x = max_x - min_x;
-    double dist_y = max_y - min_y;
 
-    std::cout << dist_x << "\n";
-    std::cout << dist_y << "\n";
+    // If both are 0 just exit
+    if (!(max_x || max_y))
+        return ;
 
-    // If the W_* are not equal weird stuff will happen but on mine they'll be a square so /shrug
     double factor;
-    if (dist_x >= dist_y)
-    {
-        factor = ((W_WIDTH - padding)/1)/dist_x;
-    }
+    // Height is bigger
+    if (max_y > max_x)
+        factor = (W_HEIGHT - padding) / max_y;
+
+    // Width is bigger
     else
-    {
-        factor = ((W_HEIGHT - padding)/1)/dist_y;
-    }
+        factor = (W_WIDTH - padding) / max_x;
 
-    for (unsigned int i = 0; i < pts.size(); i++)
+    // Expand em
+    for (size_t i = 0; i < pts.size(); i++)
     {
-        std::cout << pts[i].x * factor << "\n";
         pts[i] *= factor;
-        pts[i] += padding / 4;
+        pts[i] += padding/2;
     }
-
 }
 
-int main( int argc, char** argv)
+class Bezier
+{
+    std::vector<Point> points;
+
+    Point calculate(std::vector<Point> pts, double t)
+    {
+        if (pts.size() == 1)
+            return pts[0];
+
+        std::vector<Point> new_pts;
+        for (size_t i = 1; i < pts.size(); i++)
+        {
+
+        }
+
+
+        return calculate(new_pts, t);
+    }
+
+    public:
+    Bezier(std::vector<Point> pts)
+    {
+        points = pts;
+    }
+
+    Point get_point(double t)
+    {
+        if (t < 0 || t > 1)
+            throw;
+
+        return calculate(points, t);
+    }
+
+};
+
+int main(int argc, char** argv)
 {
     std::vector<Point> points;
     std::string input;
@@ -131,7 +144,7 @@ int main( int argc, char** argv)
             Point(string_to_pair(input))
         );
 
-    //fit_points(points);
+    fit_points(points);
 
     // Show stuff!
     for (long unsigned i = 0; i < points.size(); i++)
@@ -139,6 +152,9 @@ int main( int argc, char** argv)
         points[i] = tf_pt(points[i]);
         std::cout << points[i].to_string() << '\n';
     }
+
+    Bezier bezier = Bezier(points);
+    bezier.get_point(-1);
 
     raylib::InitWindow(W_WIDTH, W_HEIGHT, "Bezier Curve");
     raylib::SetTargetFPS(60);
