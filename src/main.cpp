@@ -1,8 +1,9 @@
-#include <iostream>
-#include <vector>
-#include <string>
 #include <cctype>
+#include <cmath>
+#include <iostream>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 #include <point.hpp>
 
@@ -15,6 +16,7 @@ namespace raylib
 #define W_HEIGHT 640
 
 typedef point::Point<double> Point;
+
 
 auto
 string_to_pair(std::string str)
@@ -41,6 +43,7 @@ string_to_pair(std::string str)
     return std::make_pair(x, y);
 }
 
+
 Point tf_pt(Point pt)
 {
     //pt.x += W_WIDTH / 2;
@@ -51,6 +54,15 @@ Point tf_pt(Point pt)
     return pt;
 }
 
+
+#define LERP(a, b, t) (a + t * (b - a))
+Point point_lerp(Point pt1, Point pt2, double t)
+{
+    return Point(LERP(pt1.x, pt2.x, t), LERP(pt1.y, pt2.y, t));
+}
+#undef LERP
+
+
 raylib::Vector2 pt_to_v(Point pt)
 {
     raylib::Vector2 v;
@@ -59,6 +71,7 @@ raylib::Vector2 pt_to_v(Point pt)
 
     return v;
 }
+
 
 void fit_points(std::vector<Point> &pts, int padding = 20)
 {
@@ -98,6 +111,7 @@ void fit_points(std::vector<Point> &pts, int padding = 20)
     }
 }
 
+
 class Bezier
 {
     std::vector<Point> points;
@@ -109,10 +123,7 @@ class Bezier
 
         std::vector<Point> new_pts;
         for (size_t i = 1; i < pts.size(); i++)
-        {
-
-        }
-
+            new_pts.push_back(point_lerp(pts[i-1], pts[i], t));
 
         return calculate(new_pts, t);
     }
@@ -126,9 +137,13 @@ class Bezier
     Point get_point(double t)
     {
         if (t < 0 || t > 1)
-            throw;
-
+            throw std::invalid_argument("t must be between 0 and 1");
         return calculate(points, t);
+    }
+
+    auto get_points(void)
+    {
+        return points;
     }
 
 };
@@ -154,21 +169,35 @@ int main(int argc, char** argv)
     }
 
     Bezier bezier = Bezier(points);
-    bezier.get_point(-1);
+
 
     raylib::InitWindow(W_WIDTH, W_HEIGHT, "Bezier Curve");
-    raylib::SetTargetFPS(60);
+    raylib::SetTargetFPS(30);
 
     const float thickness = 2.5;
 
+    double t = 0;
+    Point new_pt;
     while (!raylib::WindowShouldClose())
     {
+        if (t > 1)
+            t = 0;
+
         raylib::BeginDrawing();
             raylib::ClearBackground(raylib::WHITE);
 
-            raylib::DrawLineEx(pt_to_v(points[0]), pt_to_v(points[1]), thickness, raylib::BLACK);
+            for (Point pt : bezier.get_points())
+                raylib::DrawCircle(pt.x, pt.y, thickness*2, (raylib::Color){0, 0, 0, 128});
+
+            new_pt = bezier.get_point(t);
+            std::cout << new_pt.to_string() << "\n";
+
+            raylib::DrawCircle(new_pt.x, new_pt.y, thickness*2, (raylib::Color){0, 0, 0xff, 0xff});
+
+            //raylib::DrawLineEx(pt_to_v(points[0]), pt_to_v(points[1]), thickness, raylib::BLACK);
 
         raylib::EndDrawing();
+        t += 0.05;
     }
 
     raylib::CloseWindow();
