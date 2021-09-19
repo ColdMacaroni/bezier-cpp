@@ -120,15 +120,29 @@ void fit_points(std::vector<Point> &pts, int padding = 20)
 class Bezier
 {
     std::vector<Point> points;
+    int inc;
 
     Point calculate(std::vector<Point> pts, double t)
     {
         if (pts.size() == 1)
             return pts[0];
 
+        raylib::DrawCircle(pts[0].x, pts[0].y, 3, raylib::BLUE);
         std::vector<Point> new_pts;
         for (size_t i = 1; i < pts.size(); i++)
+        {
             new_pts.push_back(point_lerp(pts[i-1], pts[i], t));
+
+            if (t < double(1))
+            {
+                raylib::DrawLineEx(pt_to_v(pts[i-1]), pt_to_v(pts[i]), 2,
+                                   raylib::ColorAlpha(
+                                   raylib::ColorFromHSV(inc * pts.size(), 0.9, 0.7),
+                                       0.7
+                                ));
+                raylib::DrawCircle(pts[i].x, pts[i].y, 3, raylib::BLUE);
+            }
+        }
 
         return calculate(new_pts, t);
     }
@@ -137,6 +151,7 @@ class Bezier
     Bezier(std::vector<Point> pts)
     {
         points = pts;
+        inc = 360 / pts.size();
     }
 
     Point get_point(double t)
